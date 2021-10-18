@@ -47,8 +47,12 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
     user: user._id
   })
 
-  const savedBlog = await blog.save()
+  // Mutation of state so the remove button can be shown upon creating a new blog,
+  // before this the button only appeared after a page refresh
+  let savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
+  savedBlog = await Blog
+  .findById(savedBlog._id).populate('user', { username: 1, name: 1 , id: 1})
   await user.save()
   response.json(savedBlog)
 })
