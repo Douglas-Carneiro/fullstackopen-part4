@@ -21,16 +21,21 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const blog = await Blog.findById(request.params.id)
+  const comment = request.body.comment
+
+  blog.comments = blog.comments.concat(comment)
+  
+  await blog.save()
+  response.json({comment})
+})
+
+
 blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   const body = request.body
   const likes = body.likes ? body.likes : 0
 
-  // const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  // if (!request.token || !decodedToken.id) {
-  //   return response.status(401).json({ error: 'token missing or invalid' })
-  // }
-  // const user = await User.findById(decodedToken.id)
-  // get user from request object
   const user = request.user
 
   if (!(body.title || body.url)) {
